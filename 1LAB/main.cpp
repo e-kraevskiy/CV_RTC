@@ -12,7 +12,7 @@
 using namespace std;
 using namespace cv;
 
-const string img_path = "/home/eugeniy/CV_1.jpg";
+const string img_path = "/home/euheniy/CV_1.jpg";
 
 int main(int argc, char *argv[])
 {
