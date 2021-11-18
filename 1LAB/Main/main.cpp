@@ -12,7 +12,7 @@
 using namespace std;
 using namespace cv;
 
-const string IMG_PATH = "/home/eugeniy/CV_1.jpg";
+const string IMG_PATH = "/home/euheniy/CV_1.jpg";
 
 float getCorrectedCos (int x, int scale, int offset = 0) {
     float tmp = cos(float(x)/scale)*scale;
