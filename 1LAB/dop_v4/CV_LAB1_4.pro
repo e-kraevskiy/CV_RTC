@@ -10,13 +10,10 @@ CONFIG += c++11
 
 SOURCES += \
     main.cpp \
-    mainwindow.cpp
 
 HEADERS += \
-    mainwindow.h
 
 FORMS += \
-    mainwindow.ui
 
 INCLUDEPATH +="/usr/local/opencv/include/opencv4"
     LIBS += -L"/usr/local/opencv/lib/"

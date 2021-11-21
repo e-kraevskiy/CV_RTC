@@ -10,16 +10,14 @@
 using namespace std;
 using namespace cv;
 
-const string IMG_PATH = "/home/euheniy/test_image.jpg";
+const string IMG_PATH = "/home/eugeniy/git/CV_RTC/CV_IMGs/CV_1.jpg";
 
-int main(int argc, char *argv[])
+int main()
 {
-    QApplication a(argc, argv);
     Mat img;
     string path = IMG_PATH;
     img = imread(path, IMREAD_COLOR);
-    namedWindow("Display Window",WINDOW_AUTOSIZE);
     imshow("Display Window",img);
     waitKey(0);
-    return a.exec();
+    return 0;
 }
