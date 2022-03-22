@@ -13,11 +13,13 @@ link_directories(${OpenCV_LIBRARY_DIR})
 # Сюда добавляем .h-ки из директории include
 set(PROJECT_HEADERS
     task_1.h
+    task_2.h
 )
 # Сюда добавляем .cpp-ки из директории src
 set(PROJECT_SOURCES
     main.cpp
     task_1.cpp
+    task_2.cpp
 )
 
 
