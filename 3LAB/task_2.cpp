@@ -1,12 +1,8 @@
 #include "task_2.h"
 
 const double MIN_CONTOUR_AREA = 80;
+const double MAX_TO_MIN_COUNTOUR_RATIO = 2;
 
-Point findCenter1(Mat image, vector<Point> contour) {
-    Rect r = boundingRect(contour);
-    Point center(r.x+0.5*r.width, r.y+0.5*r.height);
-    return center;
-}
 
 void findVehicle(string img_path) {
     Mat src_color = imread(img_path, IMREAD_COLOR);
@@ -29,15 +25,23 @@ void findVehicle(string img_path) {
     Mat thr_clone = threshold_color.clone();
     vector<vector<Point>> contours;
     vector<Vec4i> hierarchy;
+    vector<double> contours_areas;
+    double biggest_area = 0;
     findContours(thr_clone, contours, hierarchy, RETR_EXTERNAL, CHAIN_APPROX_SIMPLE);
+    // Находим нибольшую площадь контура
     for (int i = 0; i < contours.size(); i++) {
-        if (contourArea(contours.at(i)) < MIN_CONTOUR_AREA)
-            continue;
-        cout << "contour area =" << contourArea(contours.at(i)) << endl;
-        drawContours(src_color, contours, i, CV_RGB(255, 255, 255));
-        circle(src_color, findCenter1(src_color, contours.at(i)), 5, CV_RGB(0, 0, 0), FILLED);
+        double current_area = contourArea(contours.at(i));
+        if (current_area > biggest_area)
+            biggest_area = current_area;
+        contours_areas.push_back(current_area);
     }
-    cout << endl;
+    for (int i = 0; i < contours.size(); i++) {
+        // Убираем слишком маленькие контуры
+        if (biggest_area / contours_areas.at(i) >= MAX_TO_MIN_COUNTOUR_RATIO)
+            continue;
+        drawContours(src_color, contours, i, CV_RGB(255, 255, 255));
+        circle(src_color, findCenter(src_color, contours.at(i)), 5, CV_RGB(0, 0, 0), FILLED);
+    }
     imshow("DST", src_color);
     waitKey(0);
 }

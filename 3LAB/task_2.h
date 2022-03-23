@@ -6,11 +6,12 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
+#include <array>
+
+#include "task_1.h"
 
 using namespace std;
 using namespace cv;
-
-Point findCenter1(Mat image, vector<Point> contour);
 
 void findVehicle(string img_path);
 
