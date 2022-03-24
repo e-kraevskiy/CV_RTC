@@ -38,7 +38,7 @@ int main() {
 //    findVehicle(teplovizor_3);
 //    findVehicle(teplovizor_4);
 
-//    findRobots(roboti_0);
+    findRobots(roboti_0);
     findRobots(roboti_1);
 
     return 0;

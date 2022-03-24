@@ -40,7 +40,7 @@ void findVehicle(string img_path) {
         if (biggest_area / contours_areas.at(i) >= MAX_TO_MIN_COUNTOUR_RATIO)
             continue;
         drawContours(src_color, contours, i, CV_RGB(255, 255, 255));
-        circle(src_color, findCenter(src_color, contours.at(i)), 5, CV_RGB(0, 0, 0), FILLED);
+        circle(src_color, findCenter(contours.at(i)), 5, CV_RGB(0, 0, 0), FILLED);
     }
     imshow("DST", src_color);
     waitKey(0);

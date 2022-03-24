@@ -1,6 +1,6 @@
 #include "task_1.h"
 
-Point findCenter(Mat image, vector<Point> contour) {
+Point findCenter(vector<Point> contour) {
     Rect r = boundingRect(contour);
     Point center(r.x+0.5*r.width, r.y+0.5*r.height);
     return center;
@@ -26,7 +26,7 @@ void findTarget(string img_path) {
     findContours(thr_clone, contours, hierarchy, RETR_EXTERNAL, CHAIN_APPROX_SIMPLE);
     for (int i = 0; i < contours.size(); i++) {
         drawContours(src_color, contours, i, CV_RGB(0, 0, 255));
-        circle(src_color, findCenter(src, contours.at(i)), 5, CV_RGB(255, 0, 0), FILLED);
+        circle(src_color, findCenter(contours.at(i)), 5, CV_RGB(255, 0, 0), FILLED);
     }
     imshow("DST", src_color);
     waitKey(0);

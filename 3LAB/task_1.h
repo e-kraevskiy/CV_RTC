@@ -10,7 +10,7 @@
 using namespace std;
 using namespace cv;
 
-Point findCenter(Mat image, vector<Point> contour);
+Point findCenter(vector<Point> contour);
 
 void findTarget(string img_path);
 
