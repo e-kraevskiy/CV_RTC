@@ -17,9 +17,9 @@ void findRobots(string img_path);
 
 void morphoFiltering(Mat &src);
 
-void processRobots(Mat &src, Mat &src_color, const Scalar& color);
+void processRobots(Mat &src, Mat &src_color, const Scalar& color, Point bulbCenter);
 
-void findLamp(Mat &src_color, Mat &src_hsv, const Scalar& color);
+Point findLamp(Mat &src_color, Mat &src_hsv, const Scalar& color);
 
 void copeWithBeam (Mat &src, vector<vector<Point>> &contours);
 
