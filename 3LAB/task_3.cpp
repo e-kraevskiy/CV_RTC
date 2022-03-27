@@ -47,9 +47,7 @@ void findRobots(Mat &src_color, bool is_video) {
     processRobots(threshold_red, src_color, CV_RGB(255, 0, 0), bulbCenter);
 
 
-    imshow("DST", src_color);
-    if (SHOW_DEBUG) {
-    }
+    imshow("Task 3 result", src_color);
     if (!is_video)
         waitKey(0);
 }

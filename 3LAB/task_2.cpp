@@ -11,7 +11,6 @@ void findVehicle(string img_path) {
     cvtColor(src_color, src_hsv, COLOR_BGR2HSV);
     Mat threshold_color;
     inRange(src_hsv, Scalar(0, 50, 100), Scalar(30, 255, 255), threshold_color);
-    imshow("threshold_color", threshold_color);
     Mat kernel;
     //Morphological filtering to remove small areas.
     for (int j = 0; j < 1; j++) {
@@ -20,7 +19,6 @@ void findVehicle(string img_path) {
     for (int j = 0; j < 3; j++) {
         dilate(threshold_color, threshold_color, kernel);
     }
-    imshow("threshold_color_morphoroded", threshold_color);
 
     Mat thr_clone = threshold_color.clone();
     vector<vector<Point>> contours;
@@ -42,6 +40,6 @@ void findVehicle(string img_path) {
         drawContours(src_color, contours, i, CV_RGB(255, 255, 255));
         circle(src_color, findCenter(contours.at(i)), 5, CV_RGB(0, 0, 0), FILLED);
     }
-    imshow("DST", src_color);
+    imshow("Task 2 result", src_color);
     waitKey(0);
 }

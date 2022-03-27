@@ -23,11 +23,13 @@ void findTarget(string img_path) {
     Mat thr_clone = thr.clone();
     vector<vector<Point>>contours;
     vector<Vec4i> hierarchy;
-    findContours(thr_clone, contours, hierarchy, RETR_EXTERNAL, CHAIN_APPROX_SIMPLE);
+    findContours(thr_clone, contours, hierarchy,
+                 RETR_EXTERNAL, CHAIN_APPROX_SIMPLE);
     for (int i = 0; i < contours.size(); i++) {
         drawContours(src_color, contours, i, CV_RGB(0, 0, 255));
-        circle(src_color, findCenter(contours.at(i)), 5, CV_RGB(255, 0, 0), FILLED);
+        circle(src_color, findCenter(contours.at(i)),
+               5, CV_RGB(255, 0, 0), FILLED);
     }
-    imshow("DST", src_color);
+    imshow("Task 1 result", src_color);
     waitKey(0);
 }
