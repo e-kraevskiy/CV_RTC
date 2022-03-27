@@ -24,6 +24,7 @@ const string teplovizor_4 = "../3LAB/img_zadan/teplovizor/4.jpg";
 // img for 3 task
 const string roboti_0 = "../3LAB/img_zadan/roboti/1.jpg";
 const string roboti_1 = "../3LAB/img_zadan/roboti/2.jpg";
+const string video = "../3LAB/img_zadan/roboti/robot_video.mp4";
 // img for 4 task
 
 
@@ -38,8 +39,12 @@ int main() {
 //    findVehicle(teplovizor_3);
 //    findVehicle(teplovizor_4);
 
-    findRobots(roboti_0);
-    findRobots(roboti_1);
+    Mat tmp = imread(roboti_0, IMREAD_COLOR);
+    findRobots(tmp);
+    tmp = imread(roboti_1, IMREAD_COLOR);
+    findRobots(tmp);
+
+//    processVideo(video);
 
     return 0;
 }

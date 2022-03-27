@@ -13,7 +13,7 @@
 using namespace std;
 using namespace cv;
 
-void findRobots(string img_path);
+void findRobots(Mat &src_color, bool is_video = false);
 
 void morphoFiltering(Mat &src);
 
@@ -22,5 +22,7 @@ void processRobots(Mat &src, Mat &src_color, const Scalar& color, Point bulbCent
 Point findLamp(Mat &src_color, Mat &src_hsv, const Scalar& color);
 
 void copeWithBeam (Mat &src, vector<vector<Point>> &contours);
+
+void processVideo(string video_path);
 
 #endif // TASK_3_H

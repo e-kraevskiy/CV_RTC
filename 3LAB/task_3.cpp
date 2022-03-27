@@ -6,8 +6,7 @@ bool SHOW_DEBUG = 0;
 int BEAM_WIDTH = 25;
 int BULB_AND_LAMPSHADE_DIST = 40;
 
-void findRobots(string img_path) {
-    Mat src_color = imread(img_path, IMREAD_COLOR);
+void findRobots(Mat &src_color, bool is_video) {
     Mat src_hsv = src_color.clone();
     // Перевод картинки в HSV формат
     cvtColor(src_color, src_hsv, COLOR_BGR2HSV);
@@ -47,11 +46,12 @@ void findRobots(string img_path) {
     processRobots(threshold_blue, src_color, CV_RGB(0, 0, 255), bulbCenter);
     processRobots(threshold_red, src_color, CV_RGB(255, 0, 0), bulbCenter);
 
+
     imshow("DST", src_color);
     if (SHOW_DEBUG) {
     }
-
-    waitKey(0);
+    if (!is_video)
+        waitKey(0);
 }
 
 void morphoFiltering(Mat &src) {
@@ -85,16 +85,12 @@ void processRobots(Mat &src, Mat &src_color, const Scalar& color, Point bulbCent
     if (color == CV_RGB(255, 0, 0)) {
         for (int i = 0; i < contours.size(); i++) {
             Rect rect = boundingRect(contours.at(i));
-            cout << "x=" << rect.x << " y=" << rect.y << endl;
-            cout << "widht=" << rect.width << " height=" << rect.height << endl;
             Point center = findCenter(contours.at(i));
             double dist = norm(bulbCenter - center);//Euclidian distance
-            cout << "BULB_AND_LAMPSHADE_DIST = " << dist << endl;
             if (dist > BULB_AND_LAMPSHADE_DIST - 10 and dist < BULB_AND_LAMPSHADE_DIST + 10
                     and bulbCenter.y > center.y) {
                 contours.erase(contours.begin() + i);
                 i--;
-                cout << "говнюк удален" << endl;
             }
         }
     }
@@ -105,19 +101,26 @@ void processRobots(Mat &src, Mat &src_color, const Scalar& color, Point bulbCent
             biggest_area = current_area;
         contours_areas.push_back(current_area);
     }
+    double smollest_lamp_dist = 999;
+    double smollest_lamp_dist_id = 0;
     for (int i = 0; i < contours.size(); i++) {
-        // Убираем слишком маленькие контуры
+        // Убираем слишком маленькие контуры и считаем расстояние до лампы
         if (biggest_area / contours_areas.at(i) >= 5)
             continue;
         Rect rect = boundingRect(contours.at(i));
         drawContours(src_color, contours, i, color, 3);
-        circle(src_color, findCenter(contours.at(i)), 3, CV_RGB(255, 255, 255), FILLED);
+        double dist = norm(bulbCenter - findCenter(contours.at(i)));
+        if (dist < smollest_lamp_dist) {
+            smollest_lamp_dist = dist;
+            smollest_lamp_dist_id = i;
+        }
     }
+    circle(src_color, findCenter(contours.at(smollest_lamp_dist_id)), 3, CV_RGB(0, 0, 0), FILLED);
 }
 
 Point findLamp(Mat &src_color, Mat &src_hsv, const Scalar& color) {
     Mat threshold_lamp;
-    inRange(src_hsv, Scalar(0, 0, 240), Scalar(180 , 10, 255), threshold_lamp);
+    inRange(src_hsv, Scalar(0, 0, 245), Scalar(180 , 10, 255), threshold_lamp);
     morphoFiltering(threshold_lamp);
     if (SHOW_DEBUG) {
         imshow("threshold_lamp", threshold_lamp);
@@ -128,11 +131,21 @@ Point findLamp(Mat &src_color, Mat &src_hsv, const Scalar& color) {
     Mat thr_clone = threshold_lamp.clone();
     findContours(thr_clone, contours, hierarchy, RETR_EXTERNAL, CHAIN_APPROX_SIMPLE);
     Point lamp_center;
+    // Находим наибольшую площадь контура
+    double biggest_area = 0;
+    int biggest_area_id = 0;
+    vector<double> contours_areas;
     for (int i = 0; i < contours.size(); i++) {
-        drawContours(src_color, contours, i, color, 3);
-        lamp_center = findCenter(contours.at(i));
-        circle(src_color, lamp_center, 3, color, FILLED);
+        double current_area = contourArea(contours.at(i));
+        if (current_area > biggest_area) {
+            biggest_area = current_area;
+            biggest_area_id = i;
+        }
+        contours_areas.push_back(current_area);
     }
+    drawContours(src_color, contours, biggest_area_id, color, 3);
+    lamp_center = findCenter(contours.at(biggest_area_id));
+    circle(src_color, lamp_center, 3, color, FILLED);
     return lamp_center;
 }
 
@@ -151,4 +164,34 @@ void copeWithBeam (Mat &src, vector<vector<Point>> &contours) {
         }
     }
     contours.clear();
+}
+
+void processVideo(string video_path) {
+
+    VideoCapture cap(video_path);
+    Mat frame;
+    cap >> frame;
+
+
+    // check if we succeeded
+    if (!cap.isOpened()) {
+        cerr << "ERROR! Unable to open camera\n";
+        return;
+    }
+    //--- GRAB AND WRITE LOOP
+    cout << "Press any key to exit" << endl;
+    for (;;) {
+        // wait for a new frame from camera and store it into 'frame'
+        cap.read(frame);
+        // check if we succeeded
+        if (frame.empty()) {
+            cerr << "ERROR! blank frame grabbed\n";
+            break;
+        }
+        findRobots(frame, true);
+        // show live and wait for a key with timeout long enough to show images
+        imshow("Live", frame);
+        if (waitKey(500) >= 0)
+            break;
+    }
 }
