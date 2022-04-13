@@ -36,7 +36,6 @@ void findRightGK(string img_path, string ref_img_path) {
                                  CONTOURS_MATCH_I2, 0);
         drawContours(src_color, contours, i, CV_RGB(255, 0, 0), 3);
         if (dif < 0.1) {
-            cout << "if pushed back=" << i << endl;
             valid_id.push_back(i);
         }
     }
