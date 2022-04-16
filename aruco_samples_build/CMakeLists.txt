@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.5)
 
-project(create_board_charuco LANGUAGES CXX)
+project(create_board LANGUAGES CXX)
 
 set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -16,7 +16,10 @@ set(PROJECT_HEADERS
 )
 # Сюда добавляем .cpp-ки
 set(PROJECT_SOURCES
-    create_board_charuco.cpp
+    create_board.cpp
+#    detect_markers.cpp
+#    create_marker.cpp
+#    create_board_charuco.cpp
     #calibrate_camera_charuco.cpp
     #detect_board_charuco.cpp
 )

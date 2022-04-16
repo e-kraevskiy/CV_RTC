@@ -12,16 +12,12 @@ link_directories(${OpenCV_LIBRARY_DIR})
 
 # Сюда добавляем .h-ки
 set(PROJECT_HEADERS
-    task_1.h
-    task_3.h
-    task_4.h
+    src/cube.h
 )
 # Сюда добавляем .cpp-ки
 set(PROJECT_SOURCES
-    main.cpp
-    task_1.cpp
-    task_3.cpp
-    task_4.cpp
+    src/main.cpp
+    src/cube.cpp
 )
 
 
