@@ -11,5 +11,6 @@
 using namespace std;
 using namespace cv;
 
+void calivbrateMyCamera();
 
 #endif // TASK_1_H
