@@ -1,0 +1,5 @@
+Создание доски
+./create_board_charuco "board.jpg" -w=5 -h=7 -sl=200 -ml=120 -d=10
+
+Калибровка
+./calibrate_camera_charuco "calibration.xml" -w=5 -h=7 -sl=0.033 -ml=0.0165 -d=10 -c=tutorial_camera_params.yml -v=calib_imgs/img_%02d.jpg
