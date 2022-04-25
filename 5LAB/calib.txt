@@ -7,7 +7,7 @@
 Создание маркера
 ./create_marker "marker0.png" -d=10 -id=0
 
-Калибровка
+Калибровка (с доской charuco)
 ./calibrate_camera_charuco ../calibration.xml -w=5 -h=7 -sl=0.033 -ml=0.0165 -d=10 -v=../calib_imgs/img_%02d.jpg -dp=../detector_params.yml
 Калибровка без фоток
 ./calibrate_camera_charuco ../calibration.xml -w=5 -h=7 -sl=0.033 -ml=0.0165 -d=10 -dp=../detector_params.yml

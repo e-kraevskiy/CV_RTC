@@ -38,8 +38,7 @@ int startDetecting() {
     int fps = 30;
     int fourcc = cv::VideoWriter::fourcc('M', 'J', 'P', 'G');
     cv::VideoWriter video(
-        "out.avi", fourcc, fps, cv::Size(frame_width, frame_height), true
-    );
+        "output.avi", fourcc, fps, cv::Size(frame_width, frame_height), true);
 
     while (input_video.grab()) {
 

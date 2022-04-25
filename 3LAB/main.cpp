@@ -1,8 +1,9 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
 #include <iostream>
 #include <opencv2/opencv.hpp>
-#include <stdlib.h>
-#include <stdio.h>
-#include <string.h>
 
 #include "task_1.h"
 #include "task_2.h"
@@ -29,29 +30,26 @@ const string video = "../3LAB/img_zadan/roboti/robot_video.mp4";
 const string gk = "../3LAB/img_zadan/gk/gk.jpg";
 const string gk_ref = "../3LAB/img_zadan/gk/gk_ref.jpg";
 
-
 int main() {
-// ******** 1 TASK ********
-    findTarget(allababah_0);
-    findTarget(allababah_1);
-    findTarget(allababah_2);
-// ******** 2 TASK ********
-    findVehicle(teplovizor_0);
-    findVehicle(teplovizor_1);
-    findVehicle(teplovizor_2);
-    findVehicle(teplovizor_3);
-    findVehicle(teplovizor_4);
-// ******** 3 TASK ********
-    Mat tmp = imread(roboti_0, IMREAD_COLOR);
-    findRobots(tmp);
-    tmp = imread(roboti_1, IMREAD_COLOR);
-    findRobots(tmp);
+  // ******** 1 TASK ********
+  findTarget(allababah_0);
+  findTarget(allababah_1);
+  findTarget(allababah_2);
+  // ******** 2 TASK ********
+  findVehicle(teplovizor_0);
+  findVehicle(teplovizor_1);
+  findVehicle(teplovizor_2);
+  findVehicle(teplovizor_3);
+  findVehicle(teplovizor_4);
+  // ******** 3 TASK ********
+  Mat tmp = imread(roboti_0, IMREAD_COLOR);
+  findRobots(tmp);
+  tmp = imread(roboti_1, IMREAD_COLOR);
+  findRobots(tmp);
 
-//    processVideo(video);
-// ******** 4 TASK ********
-    findRightGK(gk, gk_ref);
+  //    processVideo(video);
+  // ******** 4 TASK ********
+  findRightGK(gk, gk_ref);
 
-
-
-    return 0;
+  return 0;
 }
