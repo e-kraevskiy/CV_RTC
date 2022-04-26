@@ -12,9 +12,13 @@ using namespace std;
 
 const string FOURIER_IMG_PATH = "../4LAB/Joseph_Fourier.jpg";
 const string LENNA_IMG_PATH = "../4LAB/Lenna.png";
+const string NUMBER_IMG_PATH = "../4LAB/car_number.png";
+const string NUMBER_SYMBOL_IMG_PATH = "../4LAB/2_symbol.png";
+const string LETTER_SYMBOL_IMG_PATH = "../4LAB/m_symbol.png";
 
-void task_1(Mat img, vector<vector<int>> filter_kernel, string filter_name);
-void task_2(Mat img);
+void task_2(Mat img, vector<vector<int>> filter_kernel, string filter_name);
+void task_3(Mat img);
+void task_4(Mat src_img, Mat template_img);
 
 // Фильтр низких частот
 Mat getLowFrequence(const Mat& spectr);
@@ -22,18 +26,24 @@ Mat getLowFrequence(const Mat& spectr);
 Mat getHighFrequence(const Mat& spectr);
 // Получить "красивый" образ
 Mat getRotatedQuadrants(const Mat& src);
-// Получить спектр
+// Получить спектр изображения
 Mat getImgSpectr(const Mat& img);
 
 Mat LENNA_IMG;
 Mat FOURIER_IMG;
+Mat NUMBER_IMG;
+Mat NUMBER_SYMBOL_IMG;
+Mat LETTER_SYMBOL_IMG;
+
+// Получить свертку ДФТ
 Mat convoluteDft(Mat img, vector<vector<int>> filter, Mat output,
-                 int task_number, string filter_name);
-Mat correlateDft(Mat img1, Mat img2);
-
+                 int task_number, string filter_name, bool show_image = true);
+// Получить кореляцию ДФТ
+Mat correlateDft(Mat src_image, Mat target_img);
+// Перевод из вектора векторов в CV::Mat
 Mat vecToMat(const vector<vector<int>> input);
-
-Mat show_dft(Mat img, bool beauty_spectrum);
+// Отрисовка Фурье-образа
+Mat getDftImage(Mat img, bool beauty_spectrum);
 
 vector<vector<int>> Laplasse_kernel = {{0, 1, 0}, {1, -4, 1}, {0, 1, 0}};
 vector<vector<int>> Box_kernel = {{1, 1, 1}, {1, 1, 1}, {1, 1, 1}};
@@ -41,25 +51,35 @@ vector<vector<int>> Sobel_x_kernel = {{1, 0, -1}, {2, 0, -2}, {1, 0, -1}};
 vector<vector<int>> Sobel_y_kernel = {{1, 2, 1}, {0, 0, 0}, {-1, -2, -1}};
 
 int main() {
+  // Чтение картинок
   LENNA_IMG = imread(LENNA_IMG_PATH, IMREAD_GRAYSCALE);
   FOURIER_IMG = imread(FOURIER_IMG_PATH, IMREAD_GRAYSCALE);
-  imshow("Lenna image", LENNA_IMG);
+  NUMBER_IMG = imread(NUMBER_IMG_PATH, IMREAD_GRAYSCALE);
+  NUMBER_SYMBOL_IMG = imread(NUMBER_SYMBOL_IMG_PATH, IMREAD_GRAYSCALE);
+  LETTER_SYMBOL_IMG = imread(LETTER_SYMBOL_IMG_PATH, IMREAD_GRAYSCALE);
+  //  imshow("Lenna image", LENNA_IMG);
+  // Перевод изображений в другой формат
   LENNA_IMG.convertTo(LENNA_IMG, CV_32FC1);
   FOURIER_IMG.convertTo(FOURIER_IMG, CV_32FC1);
+  NUMBER_IMG.convertTo(NUMBER_IMG, CV_32FC1);
+  NUMBER_SYMBOL_IMG.convertTo(NUMBER_SYMBOL_IMG, CV_32FC1);
+  LETTER_SYMBOL_IMG.convertTo(LETTER_SYMBOL_IMG, CV_32FC1);
 
-  task_1(LENNA_IMG, Laplasse_kernel, "Laplasse");
-  task_1(LENNA_IMG, Box_kernel, "Box");
-  task_1(LENNA_IMG, Sobel_x_kernel, "Sobel x");
-  task_1(LENNA_IMG, Sobel_y_kernel, "Sobel y");
+  task_2(LENNA_IMG, Laplasse_kernel, "Laplasse");
+  //  task_2(LENNA_IMG, Box_kernel, "Box");
+  //  task_2(LENNA_IMG, Sobel_x_kernel, "Sobel x");
+  //  task_2(LENNA_IMG, Sobel_y_kernel, "Sobel y");
 
-  task_2(FOURIER_IMG);
+  //  task_3(FOURIER_IMG);
+
+  task_4(NUMBER_IMG, NUMBER_SYMBOL_IMG);
 
   waitKey();
 }
 
-void task_1(Mat img, vector<vector<int>> filter_kernel, string filter_name) {
+void task_2(Mat img, vector<vector<int>> filter_kernel, string filter_name) {
   Mat convolute;
-  convolute = convoluteDft(img, filter_kernel, convolute, 1, filter_name);
+  convolute = convoluteDft(img, filter_kernel, convolute, 2, filter_name);
   normalize(convolute, convolute, 0, 1, NORM_MINMAX);
   string show_name = "Task 1. " + filter_name;
   imshow(show_name, convolute);
@@ -68,9 +88,9 @@ void task_1(Mat img, vector<vector<int>> filter_kernel, string filter_name) {
   destroyAllWindows();
 }
 
-void task_2(Mat img) {
+void task_3(Mat img) {
   Mat spectr_og = getImgSpectr(img);
-  imshow("Task 2. src DFT", show_dft(spectr_og, true));
+  imshow("Task 3. src DFT", getDftImage(spectr_og, true));
   Mat low_freq, high_freq;
   high_freq = getHighFrequence(spectr_og);
   low_freq = getLowFrequence(spectr_og);
@@ -82,16 +102,62 @@ void task_2(Mat img) {
   low_freq(Rect(0, 0, img.cols, img.rows)).copyTo(low_freq);
 
   normalize(high_freq, high_freq, 0, 1, NORM_MINMAX);
-  imshow("Task 2. Hight freq", high_freq);
+  imshow("Task 3. Hight freq", high_freq);
   normalize(low_freq, low_freq, 0, 1, NORM_MINMAX);
-  imshow("Task 2. Low freq", low_freq);
+  imshow("Task 3. Low freq", low_freq);
 
   waitKey();
   destroyAllWindows();
 }
 
+void task_4(Mat src_img, Mat target_img) {
+  Mat result_mat;
+  Mat Output = src_img.clone();
+  Scalar src_scalar_mean = mean(src_img);
+  Scalar target_scalar_mean = mean(target_img);
+
+  src_img =
+      convoluteDft(src_img, Laplasse_kernel, src_img, 4, "Laplasse", false);
+  target_img = convoluteDft(target_img, Laplasse_kernel, target_img, 4,
+                            "Laplasse", false);
+
+  src_img.convertTo(src_img, CV_8U);
+  target_img.convertTo(target_img, CV_8U);
+
+  Mat src_mean(src_img.rows, src_img.cols, src_img.type(),
+               Scalar::all(src_scalar_mean[0]));
+  Mat template_mean(target_img.rows, target_img.cols, target_img.type(),
+                    Scalar::all(target_scalar_mean[0]));
+  src_img = src_img - src_mean;
+  normalize(src_img, src_img, 0, 255, cv::NORM_MINMAX, -1, cv::Mat());
+  src_img.convertTo(src_img, CV_32FC1);
+
+  target_img = target_img - template_mean;
+  normalize(target_img, target_img, 0, 255, cv::NORM_MINMAX, -1, cv::Mat());
+  target_img.convertTo(target_img, CV_32FC1);
+
+  result_mat = correlateDft(src_img, target_img);
+  normalize(result_mat, result_mat, 0, 1, cv::NORM_MINMAX, -1, cv::Mat());
+  imshow("Task 4. Correlation", result_mat);
+
+  double minVal;
+  double maxVal;
+  cv::Point minLoc, maxLoc, matchLoc;
+  cv::minMaxLoc(result_mat, &minVal, &maxVal, &minLoc, &maxLoc, cv::Mat());
+  matchLoc = maxLoc;
+  threshold(result_mat, result_mat, maxVal - 0.01, 255, CV_8U);
+  imshow("Task 4. Threshold", result_mat);
+  cv::rectangle(
+      Output, matchLoc,
+      cv::Point(matchLoc.x + target_img.cols, matchLoc.y + target_img.rows),
+      CV_RGB(255, 0, 0), 2);
+
+  imshow("Task 4. Result", Output);
+  waitKey();
+}
+
 Mat convoluteDft(Mat img, vector<vector<int>> filter, Mat output,
-                 int task_number, string filter_name) {
+                 int task_number, string filter_name, bool show_image) {
   Size dft_optimum_size;
   Mat filter_mat;
   filter_mat = vecToMat(filter);
@@ -116,19 +182,23 @@ Mat convoluteDft(Mat img, vector<vector<int>> filter, Mat output,
   // Преобразование
   dft(canvas_image, canvas_image, DFT_COMPLEX_OUTPUT);
   dft(canvas_filter, canvas_filter, DFT_COMPLEX_OUTPUT);
-
-  string show_name =
-      "Task " + std::to_string(task_number) + ". " + filter_name + " src DFT";
-  imshow(show_name, show_dft(canvas_image, true));
-  show_name = "Task " + std::to_string(task_number) + ". " + filter_name +
-              " filter DFT";
-  imshow(show_name, show_dft(canvas_filter, true));
+  string show_name = "";
+  if (show_image) {
+    show_name =
+        "Task " + std::to_string(task_number) + ". " + filter_name + " src DFT";
+    imshow(show_name, getDftImage(canvas_image, true));
+    show_name = "Task " + std::to_string(task_number) + ". " + filter_name +
+                " filter DFT";
+    imshow(show_name, getDftImage(canvas_filter, true));
+  }
 
   mulSpectrums(canvas_image, canvas_filter, canvas_image, 0, false);
 
-  show_name = "Task " + std::to_string(task_number) + ". " + filter_name +
-              " convolute DFT";
-  imshow(show_name, show_dft(canvas_image, false));
+  if (show_image) {
+    show_name = "Task " + std::to_string(task_number) + ". " + filter_name +
+                " convolute DFT";
+    imshow(show_name, getDftImage(canvas_image, false));
+  }
   //Обратное ДПФ
   dft(canvas_image, canvas_image, DFT_INVERSE | DFT_REAL_OUTPUT);
 
@@ -137,39 +207,37 @@ Mat convoluteDft(Mat img, vector<vector<int>> filter, Mat output,
   return output;
 }
 
-Mat correlateDft(Mat img1, Mat img2) {
+Mat correlateDft(Mat src_image, Mat target_img) {
   Size dftSize;
   Mat Output;
-  // Output = img1.clone();
-  // Output.create(img1.rows, img1.cols, img1.type());
 
   //Получаем оптимальные размеры холста:
-  dftSize.width = getOptimalDFTSize(img1.cols + img2.cols - 1);
-  dftSize.height = getOptimalDFTSize(img1.rows + img2.rows - 1);
+  dftSize.width = getOptimalDFTSize(src_image.cols + target_img.cols - 1);
+  dftSize.height = getOptimalDFTSize(src_image.rows + target_img.rows - 1);
 
   //Масштабируем фильтр и исходное изображение до размеров холста
-  Mat canvas_image1(dftSize, img1.type(), Scalar::all(0));
-  Mat canvas_image2(dftSize, img2.type(), Scalar::all(0));
+  Mat canvas_image1(dftSize, src_image.type(), Scalar::all(0));
+  Mat canvas_image2(dftSize, target_img.type(), Scalar::all(0));
 
-  Mat insert_region_image1(canvas_image1, Rect(0, 0, img1.cols, img1.rows));
-  Mat insert_region_image2(canvas_image2, Rect(0, 0, img2.cols, img2.rows));
+  Mat insert_region_image1(canvas_image1,
+                           Rect(0, 0, src_image.cols, src_image.rows));
+  Mat insert_region_image2(canvas_image2,
+                           Rect(0, 0, target_img.cols, target_img.rows));
 
-  img1.copyTo(insert_region_image1);
-  img2.copyTo(insert_region_image2);
+  src_image.copyTo(insert_region_image1);
+  target_img.copyTo(insert_region_image2);
 
-  //ДПФ
   dft(canvas_image1, canvas_image1, DFT_COMPLEX_OUTPUT);
   dft(canvas_image2, canvas_image2, DFT_COMPLEX_OUTPUT);
 
-  //Вывести красиво образы Фурье исходного изображения и фильтра
-  imshow("znak dft", show_dft(canvas_image1, true));
-  imshow("symbol dft", show_dft(canvas_image2, true));
+  imshow("Task 4. Src DFT", getDftImage(canvas_image1, true));
+  imshow("Task 4. Target DFT", getDftImage(canvas_image2, true));
 
   mulSpectrums(canvas_image1, canvas_image2, canvas_image1, 0, true);
 
-  imshow("convolution dft", show_dft(canvas_image1, true));
+  imshow("Task 4. Convolution DFT", getDftImage(canvas_image1, true));
 
-  //Обратное ДПФ - уже свернутого с фильтром изображения
+  //Обратное ДПФ
   dft(canvas_image1, canvas_image1, DFT_INVERSE | DFT_REAL_OUTPUT);
 
   canvas_image1.copyTo(Output);
@@ -184,7 +252,7 @@ Mat getHighFrequence(const Mat& src) {
   circle(mask, center, spectr.cols / 4, Scalar::all(0), -1);
   Mat output;
   spectr.copyTo(output, mask);
-  imshow("Task 2. High freq DFT", show_dft(output, false));
+  imshow("Task 3. High freq DFT", getDftImage(output, false));
   return output;
 }
 
@@ -196,7 +264,7 @@ Mat getLowFrequence(const Mat& src) {
   circle(mask, center, spectr.cols / 4, Scalar::all(255), -1);
   Mat output;
   spectr.copyTo(output, mask);
-  imshow("Task 2. Low freq DFT", show_dft(output, false));
+  imshow("Task 3. Low freq DFT", getDftImage(output, false));
   return output;
 }
 
@@ -211,7 +279,7 @@ Mat getImgSpectr(const Mat& img) {
   return canvas_image;
 }
 
-Mat show_dft(Mat img, bool beauty_spectrum) {
+Mat getDftImage(Mat img, bool beauty_spectrum) {
   Mat channels[2];
   Mat magn;
   // Разбиваем многоканальное изображение
