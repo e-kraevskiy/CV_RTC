@@ -11,8 +11,12 @@ using namespace cv;
 using namespace std;
 
 const string FOURIER_IMG_PATH = "../4LAB/Joseph_Fourier.jpg";
+const string FOURIER_MOUTH_IMG_PATH = "../4LAB/Joseph_Fourier_mouth.jpg";
+
 const string LENNA_IMG_PATH = "../4LAB/Lenna.png";
-const string NUMBER_IMG_PATH = "../4LAB/car_number.png";
+const string LENNA_EYE_IMG_PATH = "../4LAB/Lenna_eye.png";
+
+const string NUMBER_1_IMG_PATH = "../4LAB/123.png";
 const string NUMBER_SYMBOL_IMG_PATH = "../4LAB/2_symbol.png";
 const string LETTER_SYMBOL_IMG_PATH = "../4LAB/m_symbol.png";
 
@@ -30,8 +34,12 @@ Mat getRotatedQuadrants(const Mat& src);
 Mat getImgSpectr(const Mat& img);
 
 Mat LENNA_IMG;
+Mat LENNA_EYE_IMG;
+
 Mat FOURIER_IMG;
-Mat NUMBER_IMG;
+Mat FOURIER_MOUTH_IMG;
+
+Mat NUMBER_1_IMG;
 Mat NUMBER_SYMBOL_IMG;
 Mat LETTER_SYMBOL_IMG;
 
@@ -53,35 +61,46 @@ vector<vector<int>> Sobel_y_kernel = {{1, 2, 1}, {0, 0, 0}, {-1, -2, -1}};
 int main() {
   // Чтение картинок
   LENNA_IMG = imread(LENNA_IMG_PATH, IMREAD_GRAYSCALE);
+  LENNA_EYE_IMG = imread(LENNA_EYE_IMG_PATH, IMREAD_GRAYSCALE);
+
   FOURIER_IMG = imread(FOURIER_IMG_PATH, IMREAD_GRAYSCALE);
-  NUMBER_IMG = imread(NUMBER_IMG_PATH, IMREAD_GRAYSCALE);
+  FOURIER_MOUTH_IMG = imread(FOURIER_MOUTH_IMG_PATH, IMREAD_GRAYSCALE);
+
+  NUMBER_1_IMG = imread(NUMBER_1_IMG_PATH, IMREAD_GRAYSCALE);
   NUMBER_SYMBOL_IMG = imread(NUMBER_SYMBOL_IMG_PATH, IMREAD_GRAYSCALE);
   LETTER_SYMBOL_IMG = imread(LETTER_SYMBOL_IMG_PATH, IMREAD_GRAYSCALE);
+
   //  imshow("Lenna image", LENNA_IMG);
   // Перевод изображений в другой формат
   LENNA_IMG.convertTo(LENNA_IMG, CV_32FC1);
+  LENNA_EYE_IMG.convertTo(LENNA_EYE_IMG, CV_32FC1);
+
   FOURIER_IMG.convertTo(FOURIER_IMG, CV_32FC1);
-  NUMBER_IMG.convertTo(NUMBER_IMG, CV_32FC1);
+  FOURIER_MOUTH_IMG.convertTo(FOURIER_MOUTH_IMG, CV_32FC1);
+
+  NUMBER_1_IMG.convertTo(NUMBER_1_IMG, CV_32FC1);
   NUMBER_SYMBOL_IMG.convertTo(NUMBER_SYMBOL_IMG, CV_32FC1);
   LETTER_SYMBOL_IMG.convertTo(LETTER_SYMBOL_IMG, CV_32FC1);
 
-  task_2(LENNA_IMG, Laplasse_kernel, "Laplasse");
+  //  task_2(LENNA_IMG, Laplasse_kernel, "Laplasse");
   //  task_2(LENNA_IMG, Box_kernel, "Box");
   //  task_2(LENNA_IMG, Sobel_x_kernel, "Sobel x");
   //  task_2(LENNA_IMG, Sobel_y_kernel, "Sobel y");
 
-  //  task_3(FOURIER_IMG);
+  //  task_3(LENNA_IMG);
 
-  task_4(NUMBER_IMG, NUMBER_SYMBOL_IMG);
+  task_4(NUMBER_1_IMG, NUMBER_SYMBOL_IMG);
+  task_4(NUMBER_1_IMG, LETTER_SYMBOL_IMG);
 
   waitKey();
+  //  while (true) {}
 }
 
 void task_2(Mat img, vector<vector<int>> filter_kernel, string filter_name) {
   Mat convolute;
   convolute = convoluteDft(img, filter_kernel, convolute, 2, filter_name);
   normalize(convolute, convolute, 0, 1, NORM_MINMAX);
-  string show_name = "Task 1. " + filter_name;
+  string show_name = "Task 2. " + filter_name;
   imshow(show_name, convolute);
 
   waitKey();
@@ -111,6 +130,8 @@ void task_3(Mat img) {
 }
 
 void task_4(Mat src_img, Mat target_img) {
+  imshow("src_img", src_img);
+  imshow("target_img", target_img);
   Mat result_mat;
   Mat Output = src_img.clone();
   Scalar src_scalar_mean = mean(src_img);
@@ -142,18 +163,19 @@ void task_4(Mat src_img, Mat target_img) {
 
   double minVal;
   double maxVal;
-  cv::Point minLoc, maxLoc, matchLoc;
-  cv::minMaxLoc(result_mat, &minVal, &maxVal, &minLoc, &maxLoc, cv::Mat());
+  Point minLoc, maxLoc, matchLoc;
+  minMaxLoc(result_mat, &minVal, &maxVal, &minLoc, &maxLoc, cv::Mat());
   matchLoc = maxLoc;
   threshold(result_mat, result_mat, maxVal - 0.01, 255, CV_8U);
   imshow("Task 4. Threshold", result_mat);
-  cv::rectangle(
+  rectangle(
       Output, matchLoc,
       cv::Point(matchLoc.x + target_img.cols, matchLoc.y + target_img.rows),
       CV_RGB(255, 0, 0), 2);
 
   imshow("Task 4. Result", Output);
   waitKey();
+  //  destroyAllWindows();
 }
 
 Mat convoluteDft(Mat img, vector<vector<int>> filter, Mat output,
